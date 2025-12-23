@@ -120,6 +120,7 @@ void ggml_profile_init(void) {
   if (ggml_profile_output_dir == NULL) {
 	ggml_profile_output_dir = "./ggml_profile_output";
   }
+  ggml_profile_manager.output_dir = ggml_profile_output_dir;
 
   if (ggml_profile_manager.profile_mode != 0) {
 	struct stat sb;
