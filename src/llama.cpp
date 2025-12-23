@@ -10,6 +10,8 @@
 #include "ggml.h"
 #include "ggml-backend.h"
 
+#include "ggml-profile.h"
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
@@ -76,6 +78,9 @@ void llama_backend_init(void) {
         struct ggml_context * ctx = ggml_init(params);
         ggml_free(ctx);
     }
+
+    // Initialize ggml-profile
+	ggml_profile_init();
 }
 
 void llama_numa_init(enum ggml_numa_strategy numa) {
@@ -91,7 +96,10 @@ void llama_numa_init(enum ggml_numa_strategy numa) {
 }
 
 void llama_backend_free(void) {
-    ggml_quantize_free();
+  ggml_quantize_free();
+
+  // Cleanup ggml-profile
+  ggml_profile_quit();
 }
 
 int64_t llama_time_us(void) {
