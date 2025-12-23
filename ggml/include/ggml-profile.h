@@ -22,6 +22,7 @@ typedef enum {
 typedef struct ggml_profile_node_record_t {
   int step;
   char node_name[GGML_MAX_NAME_LEN];
+  char node_src_name[GGML_MAX_NAME_LEN];
   double node_compute_time_ns;
   size_t node_tensor_size_bytes;
 } ggml_profile_node_record_t;
