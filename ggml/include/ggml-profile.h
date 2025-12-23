@@ -33,7 +33,7 @@ typedef struct ggml_profile_manager_t {
   char *output_dir;
   double tsc_period_ns;
   // Decode Step
-  int step; 
+  int step;
   // Array of recorded data.
   size_t record_cap;
   size_t record_size;
