@@ -1184,6 +1184,7 @@ int llama_context::decode(const llama_batch & batch_inp) {
         {
           static int step = 0;
           ggml_profile_manager.step = step;
+          ggml_profile_manager.tmp_node_n = 0;
 
           GGML_PROFILE_MODE ggml_profile_mode =
               ggml_profile_manager.profile_mode;

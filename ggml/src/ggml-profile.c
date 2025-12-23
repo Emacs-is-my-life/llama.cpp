@@ -217,12 +217,14 @@ void ggml_profile_record_write(void) {
   }
 
   // Write node_records in CSV format
-  fprintf(f_ptr, "step, node_name, node_src_name, node_compute_time_ns, node_tensor_size_bytes\n");
+  fprintf(f_ptr, "step, node_n, node_name, node_src_name, node_compute_time_ns, node_tensor_size_bytes\n");
   size_t record_size = ggml_profile_manager.record_size;
   ggml_profile_node_record_t* record_arr = ggml_profile_manager.record_arr;
   for (size_t i = 0; i < record_size; i++) {
 	ggml_profile_node_record_t* node_record = &record_arr[i];
-	fprintf(f_ptr, "%d, %s, %s, %lf, %zu\n", node_record->step,
+	fprintf(f_ptr, "%d, %d, %s, %s, %lf, %zu\n",
+                node_record->step,
+				node_record->node_n,
                 node_record->node_name,
 				node_record->node_src_name,
                 node_record->node_compute_time_ns,
@@ -294,7 +296,8 @@ bool ggml_profile_node(struct ggml_tensor *t, bool ask,
 #endif
 
       ggml_profile_node_record_t node_record;
-	  node_record.step = ggml_profile_manager.step;
+      node_record.step = ggml_profile_manager.step;
+	  node_record.node_n = ggml_profile_manager.tmp_node_n++;
 	  strcpy(node_record.node_name, t->name);
 	  ggml_profile_find_node_src_name(t, node_record.node_src_name);
       node_record.node_compute_time_ns = node_compute_time_ns;

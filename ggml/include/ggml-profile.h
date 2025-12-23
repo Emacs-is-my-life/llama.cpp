@@ -21,6 +21,7 @@ typedef enum {
 
 typedef struct ggml_profile_node_record_t {
   int step;
+  int node_n;
   char node_name[GGML_MAX_NAME_LEN];
   char node_src_name[GGML_MAX_NAME_LEN];
   double node_compute_time_ns;
@@ -38,7 +39,8 @@ typedef struct ggml_profile_manager_t {
   size_t record_cap;
   size_t record_size;
   ggml_profile_node_record_t *record_arr;
-  // Record the starting timestamp
+  // Stateful info for per-node tracking
+  int tmp_node_n;
   uint64_t tmp_tsc;
   struct timespec tmp_ts;
 } ggml_profile_manager_t;
