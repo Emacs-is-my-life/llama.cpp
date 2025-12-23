@@ -83,7 +83,7 @@ static inline uint64_t ggml_profile_tsc_get(void) {
 
 double ggml_profile_tsc_calibration(void) {
   uint64_t pct_freq;
-  __asm__ __volatile__ ("mrs %0, cntfrq_el0" : "=r" (val));
+  __asm__ __volatile__ ("mrs %0, cntfrq_el0" : "=r" (pct_freq));
 
   double tsc_period_in_ns = 1000000000L / (double) pct_freq;
   return tsc_period_in_ns;
