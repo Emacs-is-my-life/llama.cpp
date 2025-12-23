@@ -24,8 +24,8 @@ ggml_profile_manager_t ggml_profile_manager;
 #include <x86intrin.h>
 
 double ggml_profile_tsc_calibration(void) {
-  struct timespec ts_wait_period = { .tv_sec  = 1,
-                                     .tv_nsec = 0}; // Sleep for a second
+  struct timespec ts_wait_period = { .tv_sec  = 0,
+                                     .tv_nsec = 100000000}; // Sleep for 100ms
 
   struct timespec ts_start;
   struct timespec ts_end;
@@ -82,10 +82,37 @@ static inline uint64_t ggml_profile_tsc_get(void) {
 #elif defined(__aarch64__)
 
 double ggml_profile_tsc_calibration(void) {
-  uint64_t pct_freq;
-  __asm__ __volatile__ ("mrs %0, cntfrq_el0" : "=r" (pct_freq));
+  struct timespec ts_wait_period = { .tv_sec  = 0,
+                                     .tv_nsec = 100000000}; // Sleep for 100ms
 
-  double tsc_period_in_ns = 1000000000L / (double) pct_freq;
+  struct timespec ts_start;
+  struct timespec ts_end;
+  uint64_t tsc_start;
+  uint64_t tsc_end;
+          
+  // Get Walltime 
+  clock_gettime(CLOCK_MONOTONIC_RAW, &ts_start);
+  // Get TSC
+  __asm__ __volatile__ ("isb" ::: "memory");
+  __asm__ __volatile__ ("mrs %0, cntvct_el0" : "=r" (tsc_start));
+  __asm__ __volatile__ ("isb" ::: "memory");
+
+  // Sleep
+  nanosleep(&ts_wait_period, NULL);
+
+  // Get Walltime
+  clock_gettime(CLOCK_MONOTONIC_RAW, &ts_end);
+  // Get TSC
+  __asm__ __volatile__ ("isb" ::: "memory");
+  __asm__ __volatile__ ("mrs %0, cntvct_el0" : "=r" (tsc_end));
+  __asm__ __volatile__ ("isb" ::: "memory");
+
+  uint64_t ns_elapsed = (ts_end.tv_sec - ts_start.tv_sec) * 1000000000L +
+                        (ts_end.tv_nsec - ts_start.tv_nsec);
+  
+  uint64_t tsc_elapsed = tsc_end - tsc_start;
+
+  double tsc_period_in_ns = (double)ns_elapsed / (double)tsc_elapsed;
   return tsc_period_in_ns;
 }
 
@@ -93,7 +120,7 @@ static inline uint64_t ggml_profile_tsc_get(void) {
   uint64_t tsc;
 
   __asm__ __volatile__ ("isb" ::: "memory");
-  __asm__ __volatile__ ("mrs %0, cntpct_el0" : "=r" (tsc));
+  __asm__ __volatile__ ("mrs %0, cntvct_el0" : "=r" (tsc));
   __asm__ __volatile__ ("isb" ::: "memory");
 
   return tsc;
