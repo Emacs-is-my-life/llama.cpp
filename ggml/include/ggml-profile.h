@@ -43,14 +43,11 @@ typedef struct ggml_profile_manager_t {
 } ggml_profile_manager_t;
 
 // Singleton object
-extern ggml_profile_manager_t ggml_profile_manager;
+GGML_API ggml_profile_manager_t ggml_profile_manager;
 
-void ggml_profile_init(void);
-void ggml_profile_quit(void);
-static bool ggml_profile_node(struct ggml_tensor *t, bool ask, void *user_data);
-
-double ggml_profile_tsc_calibration(void);
-static inline uint64_t ggml_profile_tsc_get(void);
+GGML_API void ggml_profile_init(void);
+GGML_API void ggml_profile_quit(void);
+GGML_API bool ggml_profile_node(struct ggml_tensor *t, bool ask, void *user_data);
 
 #ifdef __cplusplus
 }
