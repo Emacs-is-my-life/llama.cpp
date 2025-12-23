@@ -257,6 +257,7 @@ bool ggml_profile_node(struct ggml_tensor *t, bool ask,
 #endif
 
       ggml_profile_node_record_t node_record;
+	  node_record.step = ggml_profile_manager.step;
       strcpy(node_record.node_name, t->name);
       node_record.node_compute_time_ns = node_compute_time_ns;
       node_record.node_tensor_size_bytes = ggml_nbytes(t);
