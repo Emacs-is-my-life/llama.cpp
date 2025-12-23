@@ -5,11 +5,6 @@
 
 #define GGML_MAX_NAME_LEN 64
 
-#define GGML_PROFILE_NONE    0  // 0000 0000
-#define GGML_PROFILE_COMPUTE 1  // 0000 0001 (1 << 0)
-#define GGML_PROFILE_MEMORY  2  // 0000 0010 (1 << 1)
-#define GGML_PROFILE_DISK 4     // 0000 0100 (1 << 2)
-
 /* extern "C" keyword is needed
    because the way mangling symbol is different
    for C and C++
