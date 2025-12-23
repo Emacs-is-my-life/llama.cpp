@@ -183,7 +183,7 @@ void ggml_profile_record_write(void) {
   strcpy(output_path, ggml_profile_manager.output_dir);
   strcat(output_path, "/ggml_profile_node_records.csv");
 
-  FILE *f_ptr = fopen(output_path, 'w');
+  FILE *f_ptr = fopen(output_path, "w");
   if (f_ptr == NULL) {
     perror("Failed to open output file for profile records.");
 	exit(EXIT_FAILURE);
