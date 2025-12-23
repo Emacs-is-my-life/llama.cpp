@@ -15,6 +15,9 @@
 #include "ggml-backend.h"
 #include "ggml-profile.h"
 
+// Singleton object
+ggml_profile_manager_t ggml_profile_manager;
+
 // Compute Profiling Code
 #if defined(__x86_64__)
 
