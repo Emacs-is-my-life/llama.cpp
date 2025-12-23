@@ -8,6 +8,8 @@
 #include "llama-mmap.h"
 #include "llama-model.h"
 
+#include "ggml-profile.h"
+
 #include <cinttypes>
 #include <cmath>
 #include <cstring>
@@ -1174,9 +1176,28 @@ int llama_context::decode(const llama_batch & batch_inp) {
         }
 
         // plot the computation graph in dot format (for debugging purposes)
-        //if (n_past%100 == 0) {
+        // if (n_past%100 == 0) {
         //    ggml_graph_dump_dot(gf, NULL, "llama.dot");
         //}
+
+        // Dump compute graph
+        {
+          static int step = 0;
+          ggml_profile_manager.step = step;
+
+          GGML_PROFILE_MODE ggml_profile_mode =
+              ggml_profile_manager.profile_mode;
+          if (ggml_profile_mode & GGML_PROFILE_GRAPH) {
+            char output_path[256];
+			char path_template[256];
+            strcpy(path_template, ggml_profile_manager.output_dir);
+            strcat(path_template, "/step_%d_compute_graph.dot");
+            sprintf(output_path, path_template, step);
+			ggml_graph_dump_dot(res->get_gf(), NULL, output_path);
+          }
+
+          step++;
+        }
 
         auto * t_logits = res->get_logits();
         auto * t_embd   = cparams.embeddings ? res->get_embd() : nullptr;

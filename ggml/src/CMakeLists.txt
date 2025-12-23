@@ -196,6 +196,7 @@ add_library(ggml-base
             ../include/ggml-cpp.h
             ../include/ggml-opt.h
             ../include/gguf.h
+			../include/ggml-profile.h
             ggml.c
             ggml.cpp
             ggml-alloc.c
@@ -205,7 +206,8 @@ add_library(ggml-base
             ggml-threading.h
             ggml-quants.c
             ggml-quants.h
-            gguf.cpp)
+            gguf.cpp
+			ggml-profile.c)
 
 set_target_properties(ggml-base PROPERTIES
     VERSION ${GGML_VERSION}
