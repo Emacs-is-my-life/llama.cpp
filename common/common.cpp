@@ -5,8 +5,6 @@
 #include "ggml.h"
 #include "gguf.h"
 
-#include "ggml-profile.h"
-
 #include "common.h"
 #include "log.h"
 #include "llama.h"
@@ -1301,10 +1299,6 @@ common_init_result_ptr common_init_from_params(common_params & params) {
         llama_perf_context_reset(lctx);
         llama_set_warmup(lctx, false);
     }
-
-    // ggml-profile: Attach profiler function as a hook
-    params.cb_eval = ggml_profile_node;
-	params.cb_eval_user_data = NULL;
 
     return res;
 }

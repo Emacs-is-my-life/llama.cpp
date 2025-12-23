@@ -7,6 +7,8 @@
 #include "sampling.h"
 #include "download.h"
 
+#include "ggml-profile.h"
+
 // fix problem with std::min and std::max
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
@@ -803,6 +805,10 @@ bool common_params_parse(int argc, char ** argv, common_params & params, llama_e
         fprintf(stderr, "%s\n", ex.what());
         exit(1); // for other exceptions, we exit with status code 1
     }
+
+	// ggml-profile: Attach profiler function as a hook
+    params.cb_eval = ggml_profile_node;
+	params.cb_eval_user_data = NULL;
 
     return true;
 }
