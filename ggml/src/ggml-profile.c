@@ -218,7 +218,7 @@ void ggml_profile_quit(void) {
   free(ggml_profile_manager.record_arr);
 }
 
-static bool ggml_profile_node(struct ggml_tensor *t, bool ask,
+bool ggml_profile_node(struct ggml_tensor *t, bool ask,
                               void *user_data) {
   GGML_PROFILE_MODE ggml_profile_mode = ggml_profile_manager.profile_mode;
   if (ggml_profile_mode == GGML_PROFILE_NONE) {
