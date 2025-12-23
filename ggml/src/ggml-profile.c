@@ -263,5 +263,7 @@ bool ggml_profile_node(struct ggml_tensor *t, bool ask,
 
       ggml_profile_record_append(&node_record);
 	}
-  }	
+  }
+
+  return true;
 }
