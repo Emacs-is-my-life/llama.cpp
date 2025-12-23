@@ -206,7 +206,7 @@ void ggml_profile_quit(void) {
   // Write node profiling records to disk
   GGML_PROFILE_MODE ggml_profile_mode = ggml_profile_manager.profile_mode;
   bool records_exist = (ggml_profile_mode & GGML_PROFILE_GRAPH) ||
-                       (ggml_profile_mode & GGML_PROFILE_MEMORY);
+                       (ggml_profile_mode & GGML_PROFILE_COMPUTE);
   if (records_exist) {
 	ggml_profile_record_write();
   }
