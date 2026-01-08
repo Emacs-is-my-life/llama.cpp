@@ -18,6 +18,30 @@
 // Singleton object
 ggml_profile_manager_t ggml_profile_manager;
 
+static long perf_event_open(struct perf_event_attr *hw_event, unsigned long flags) {
+  return syscall(__NR_perf_event_open, hw_event, 0, -1, -1, flags);
+}
+
+int setup_perf_counter(uint64_t config) {
+  struct perf_event_attr pe;
+  memset(&pe, 0, sizeof(struct perf_event_attr));
+
+  pe.type = PERF_TYPE_SOFTWARE;
+  pe.size = sizeof(struct perf_event_attr);
+  pe.config = config;
+  pe.disabled = 1;        // Start disabled
+  pe.exclude_kernel = 1;  // Exclude kernel-space faults
+  pe.exclude_hv = 1;      // Exclude hypervisor faults
+
+  int fd = perf_event_open(&pe, 0);
+  if (fd == -1) {
+	perror("Failed to create perf event counter");
+	exit(EXIT_FAILURE);
+  }
+
+  return fd;
+}
+
 
 void ggml_profile_init(void) {
   // Set profiling mode
@@ -28,6 +52,7 @@ void ggml_profile_init(void) {
   }
 
   ggml_profile_manager.profile_mode = profile_mode;
+  ggml_profile_manager.step = 0;
 
   // Set output directory
   char* ggml_profile_output_dir = getenv("GGML_PROFILE_OUTPUT_DIR");
@@ -44,6 +69,12 @@ void ggml_profile_init(void) {
 		exit(EXIT_FAILURE);
 	  }    
 	}
+  }
+
+  // Initialize perf counters
+  if (profile_mode & GGML_PROFILE_PAGE_FAULT) {
+	ggml_profile_manager.fd_perf_major_page_faults = setup_perf_counter(PERF_COUNT_SW_PAGE_FAULTS_MAJ);
+	ggml_profile_manager.fd_perf_major_page_faults = setup_perf_counter(PERF_COUNT_SW_PAGE_FAULTS_MIN);
   }
 }
 
@@ -91,7 +122,7 @@ void ggml_profile_record_write(void) {
 	fprintf(f_ptr, "%d,%lld,%lld\n",
                 pf_record->step,
                 pf_record->major_page_faults,
-                pf_record->minor_page_faults,);
+                pf_record->minor_page_faults);
   }
 
   fflush(f_ptr);
@@ -104,8 +135,41 @@ void ggml_profile_quit(void) {
   bool records_exist = (ggml_profile_mode & GGML_PROFILE_PAGE_FAULT);
   if (records_exist) {
 	ggml_profile_record_write();
+
+	close(ggml_profile_manager.fd_perf_major_page_faults);
+	close(ggml_profile_manager.fd_perf_minor_page_faults);
   }
 
   // Free memory
   free(ggml_profile_manager.record_arr);
+}
+
+void ggml_profile_pre_token(void) {
+  // Reset counters
+  ioctl(ggml_profile_manager.fd_perf_major_page_faults, PERF_EVENT_IOC_RESET, 0);
+  ioctl(ggml_profile_manager.fd_perf_minor_page_faults, PERF_EVENT_IOC_RESET, 0);
+
+  // Enable counters
+  ioctl(ggml_profile_manager.fd_perf_major_page_faults, PERF_EVENT_IOC_ENABLE, 0);
+  ioctl(ggml_profile_manager.fd_perf_minor_page_faults, PERF_EVENT_IOC_ENABLE, 0);
+}
+
+void ggml_profile_post_token(void) {
+  // Disable counters
+  ioctl(ggml_profile_manager.fd_perf_major_page_faults, PERF_EVENT_IOC_DISABLE, 0);
+  ioctl(ggml_profile_manager.fd_perf_major_page_faults, PERF_EVENT_IOC_DISABLE, 0);
+
+  long long pf_major = 0;
+  long long pf_minor = 0;
+
+  read(ggml_profile_manager.fd_perf_major_page_faults, &pf_major, sizeof(long long));
+  read(ggml_profile_manager.fd_perf_minor_page_faults, &pf_minor, sizeof(long long));
+
+  ggml_profile_pf_record_t pf_record;
+  pf_record.step = ggml_profile_manager.step;
+  pf_record.major_page_faults = pf_major;
+  pf_record.minor_page_faults = pf_minor;
+  ggml_profile_record_append(&pf_record);
+
+  ggml_profile_manager.step++;
 }

@@ -8,6 +8,8 @@
 #include "llama-mmap.h"
 #include "llama-model.h"
 
+#include "ggml-perf.h"
+
 #include <cinttypes>
 #include <cmath>
 #include <cstring>
@@ -1068,6 +1070,7 @@ int llama_context::decode(const llama_batch & batch_inp) {
     memory_update(false);
 
 	// HOOKPOINT: PROFILE_START
+	ggml_profile_pre_token();
 
     llama_memory_context_ptr mctx;
 
@@ -1314,6 +1317,7 @@ int llama_context::decode(const llama_batch & batch_inp) {
     //synchronize();
 
 	// HOOKPOINT: PROFILE_END
+	ggml_profile_post_token();
 
     return 0;
 }

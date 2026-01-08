@@ -3,6 +3,9 @@
 
 #include <linux/perf_event.h>
 #include <sys/ioctl.h>
+#include <sys/syscall.h>
+#include <sys/mman.h>
+#include <errno.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
@@ -42,7 +45,8 @@ typedef struct ggml_profile_manager_t {
   size_t record_size;
   ggml_profile_pf_record_t *record_arr;
   // File descriptor for perf interface
-  int fd;
+  int fd_perf_major_page_faults;
+  int fd_perf_minor_page_faults;
 } ggml_profile_manager_t;
 
 // Singleton object
@@ -50,8 +54,8 @@ GGML_API ggml_profile_manager_t ggml_profile_manager;
 
 GGML_API void ggml_profile_init(void);
 GGML_API void ggml_profile_quit(void);
-GGML_API bool ggml_profile_pre_token(void);
-GGML_API bool ggml_profile_post_token(void);
+GGML_API void ggml_profile_pre_token(void);
+GGML_API void ggml_profile_post_token(void);
 
 #ifdef __cplusplus
 }
