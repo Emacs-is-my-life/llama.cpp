@@ -135,5 +135,11 @@ poetry.toml
 # IDE
 /*.code-workspace
 /.windsurf/
+
 # emscripten
 a.out.*
+
+# Personal
+/.guix/
+/.agent-shell/
+compile_commands.json

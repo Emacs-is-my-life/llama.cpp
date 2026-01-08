@@ -1067,6 +1067,8 @@ int llama_context::decode(const llama_batch & batch_inp) {
     // handle any pending shifts/copies
     memory_update(false);
 
+	// HOOKPOINT: PROFILE_START
+
     llama_memory_context_ptr mctx;
 
     while (true) {
@@ -1310,6 +1312,8 @@ int llama_context::decode(const llama_batch & batch_inp) {
 
     // wait for the computation to finish (automatically done when obtaining the model output)
     //synchronize();
+
+	// HOOKPOINT: PROFILE_END
 
     return 0;
 }
