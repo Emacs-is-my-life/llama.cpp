@@ -53,6 +53,8 @@ void ggml_profile_init(void) {
 
   ggml_profile_manager.profile_mode = profile_mode;
   ggml_profile_manager.step = 0;
+  ggml_profile_manager.record_cap = 0;
+  ggml_profile_manager.record_size = 0;
 
   // Set output directory
   char* ggml_profile_output_dir = getenv("GGML_PROFILE_OUTPUT_DIR");
@@ -74,7 +76,7 @@ void ggml_profile_init(void) {
   // Initialize perf counters
   if (profile_mode & GGML_PROFILE_PAGE_FAULT) {
 	ggml_profile_manager.fd_perf_major_page_faults = setup_perf_counter(PERF_COUNT_SW_PAGE_FAULTS_MAJ);
-	ggml_profile_manager.fd_perf_major_page_faults = setup_perf_counter(PERF_COUNT_SW_PAGE_FAULTS_MIN);
+	ggml_profile_manager.fd_perf_minor_page_faults = setup_perf_counter(PERF_COUNT_SW_PAGE_FAULTS_MIN);
   }
 }
 
@@ -83,7 +85,9 @@ void ggml_profile_record_append(const ggml_profile_pf_record_t *pf_record) {
   // If it's full, then realloc to stretch it.
   bool is_record_arr_full = ggml_profile_manager.record_size >= ggml_profile_manager.record_cap;
   if (is_record_arr_full) {
-    size_t new_record_cap = 2 * ggml_profile_manager.record_cap;
+    size_t new_record_cap = (ggml_profile_manager.record_cap == 0) 
+                        ? 1024 
+                        : 2 * ggml_profile_manager.record_cap;
     ggml_profile_pf_record_t *new_record_arr =
         realloc(ggml_profile_manager.record_arr,
                 new_record_cap * sizeof(ggml_profile_pf_record_t));
@@ -157,7 +161,7 @@ void ggml_profile_pre_token(void) {
 void ggml_profile_post_token(void) {
   // Disable counters
   ioctl(ggml_profile_manager.fd_perf_major_page_faults, PERF_EVENT_IOC_DISABLE, 0);
-  ioctl(ggml_profile_manager.fd_perf_major_page_faults, PERF_EVENT_IOC_DISABLE, 0);
+  ioctl(ggml_profile_manager.fd_perf_minor_page_faults, PERF_EVENT_IOC_DISABLE, 0);
 
   long long pf_major = 0;
   long long pf_minor = 0;
