@@ -139,9 +139,10 @@ poetry.toml
 # emscripten
 a.out.*
 
-# Personal
+# Local Development
 /.guix/
 compile_commands.json
+/tmp/
 
 # Profiling Result
 profile-output/*
