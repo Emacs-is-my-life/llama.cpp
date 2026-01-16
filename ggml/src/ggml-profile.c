@@ -145,7 +145,7 @@ void ggml_profile_init(void) {
   // Set output directory
   char* ggml_profile_output_dir = getenv("GGML_PROFILE_OUTPUT_DIR");
   if (ggml_profile_output_dir == NULL) {
-	ggml_profile_output_dir = "./ggml_profile_output";
+	ggml_profile_output_dir = "./profile-output";
   }
   ggml_profile_manager.output_dir = ggml_profile_output_dir;
 
