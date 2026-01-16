@@ -142,3 +142,6 @@ a.out.*
 # Personal
 /.guix/
 compile_commands.json
+
+# Profiling Result
+profile-output/*
