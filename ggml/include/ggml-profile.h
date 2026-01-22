@@ -23,7 +23,7 @@ typedef struct ggml_profile_node_record_t {
   int step;
   int node_n;
   char node_name[GGML_MAX_NAME_LEN];
-  char node_src_name[GGML_MAX_NAME_LEN];
+  uintptr_t tensor_addr;
   double node_compute_time_ns;
   size_t node_tensor_size_bytes;
   size_t node_input_size_bytes;
