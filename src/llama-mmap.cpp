@@ -279,28 +279,35 @@ struct llama_mmap::impl {
         int flags = MAP_SHARED;
         if (numa) { prefetch = 0; }
 #ifdef __linux__
+		/*  Turn off prefetch mechanism
         if (posix_fadvise(fd, 0, 0, POSIX_FADV_SEQUENTIAL)) {
             LLAMA_LOG_WARN("warning: posix_fadvise(.., POSIX_FADV_SEQUENTIAL) failed: %s\n",
                     strerror(errno));
         }
         if (prefetch) { flags |= MAP_POPULATE; }
+		*/
 #endif
         addr = mmap(NULL, file->size(), PROT_READ, flags, fd, 0);
         if (addr == MAP_FAILED) {
             throw std::runtime_error(format("mmap failed: %s", strerror(errno)));
         }
 
+		/* Turn off prefetch mechanism
         if (prefetch > 0) {
             if (posix_madvise(addr, std::min(file->size(), prefetch), POSIX_MADV_WILLNEED)) {
                 LLAMA_LOG_WARN("warning: posix_madvise(.., POSIX_MADV_WILLNEED) failed: %s\n",
                         strerror(errno));
             }
         }
+		*/
+
         if (numa) {
+		  /* Turn off prefetch mechanism
             if (posix_madvise(addr, file->size(), POSIX_MADV_RANDOM)) {
                 LLAMA_LOG_WARN("warning: posix_madvise(.., POSIX_MADV_RANDOM) failed: %s\n",
                         strerror(errno));
             }
+		  */
         }
 
         mapped_fragments.emplace_back(0, file->size());
