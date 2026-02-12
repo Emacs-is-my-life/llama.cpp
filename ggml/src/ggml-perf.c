@@ -32,7 +32,6 @@ int setup_perf_counter(uint64_t config) {
   pe.disabled = 1;        // Start disabled
   pe.exclude_kernel = 1;  // Exclude kernel-space faults
   pe.exclude_hv = 1;      // Exclude hypervisor faults
-  pe.inherit = 1;         // Aggregate all page faults, from all threads
 
   int fd = perf_event_open(&pe, 0);
   if (fd == -1) {
