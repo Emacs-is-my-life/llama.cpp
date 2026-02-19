@@ -10,6 +10,9 @@
 // FIXME: required here for quantization functions
 #include "ggml-quants.h"
 
+// Profiling
+#include "ggml-profile.h"
+
 #ifdef GGML_USE_CPU_HBM
 #include <hbwmalloc.h>
 #endif
@@ -7351,10 +7354,13 @@ void ggml_graph_dump_dot(const struct ggml_cgraph * gb, const struct ggml_cgraph
         }
 
         if (grad) {
-            fprintf(fp, " | <g>%s\"; ]\n", ggml_op_symbol(grad->op));
+            fprintf(fp, " | <g>%s\";", ggml_op_symbol(grad->op));
         } else {
-            fprintf(fp, "\"; ]\n");
+            fprintf(fp, "\";");
         }
+
+        struct ggml_tensor *concrete_tensor = ggml_profile_get_concrete_tensor(node);
+		fprintf(fp, " | %p | %zu ]\n", (void*) concrete_tensor, ggml_nbytes_pad(concrete_tensor));
     }
 
     for (int i = 0; i < gb->n_leafs; i++) {
@@ -7396,7 +7402,9 @@ void ggml_graph_dump_dot(const struct ggml_cgraph * gb, const struct ggml_cgraph
             }
             fprintf(fp, ")");
         }
-        fprintf(fp, "\"; ]\n");
+        fprintf(fp, "\";");
+		struct ggml_tensor *concrete_tensor = ggml_profile_get_concrete_tensor(node);
+		fprintf(fp, " | %p | %zu ]\n", (void*) concrete_tensor, ggml_nbytes_pad(concrete_tensor));
     }
 
     for (int i = 0; i < gb->n_nodes; i++) {

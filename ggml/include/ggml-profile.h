@@ -52,7 +52,8 @@ GGML_API ggml_profile_manager_t ggml_profile_manager;
 GGML_API void ggml_profile_init(void);
 GGML_API void ggml_profile_quit(void);
 GGML_API bool ggml_profile_node(struct ggml_tensor *t, bool ask, void *user_data);
-
+GGML_API struct ggml_tensor *ggml_profile_get_concrete_tensor(struct ggml_tensor *t);
+  
 #ifdef __cplusplus
 }
 #endif

@@ -249,12 +249,28 @@ void ggml_profile_quit(void) {
   free(ggml_profile_manager.record_arr);
 }
 
-struct ggml_tensor * ggml_profile_get_concrete_tensor_addr(struct ggml_tensor *t) {
+size_t ggml_profile_get_concrete_tensor_addr(struct ggml_tensor *t) {
+  if (t->view_src == NULL) {
+	return ggml_nbytes_pad(t);
+  }
+  
+  return ggml_profile_get_concrete_tensor_addr(t->view_src);
+}
+
+struct ggml_tensor * ggml_profile_get_concrete_tensor_size(struct ggml_tensor *t) {
   if (t->view_src == NULL) {
 	return t;
   }
   
   return ggml_profile_get_concrete_tensor_addr(t->view_src);
+}
+
+struct ggml_tensor *ggml_profile_get_concrete_tensor(struct ggml_tensor *t) {
+  if (t->view_src == NULL) {
+	return t;
+  }
+  
+  return ggml_profile_get_concrete_tensor(t->view_src);
 }
 
 bool ggml_profile_node(struct ggml_tensor *t, bool ask,
