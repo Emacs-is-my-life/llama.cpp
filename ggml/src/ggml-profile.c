@@ -313,7 +313,7 @@ bool ggml_profile_node(struct ggml_tensor *t, bool ask,
       node_record.step = ggml_profile_manager.step;
 	  node_record.node_n = ggml_profile_manager.tmp_node_n++;
 	  strcpy(node_record.node_name, t->name);
-	  node_record.tensor_addr = (uintptr_t) ggml_profile_get_concrete_tensor_addr(t);
+	  node_record.tensor_addr = ggml_profile_get_concrete_tensor(t);
       node_record.node_compute_time_ns = node_compute_time_ns;
       node_record.node_tensor_size_bytes = ggml_nbytes_pad(t);
       ggml_profile_record_append(&node_record);
