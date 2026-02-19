@@ -222,14 +222,13 @@ void ggml_profile_record_write(void) {
   ggml_profile_node_record_t* record_arr = ggml_profile_manager.record_arr;
   for (size_t i = 0; i < record_size; i++) {
 	ggml_profile_node_record_t* node_record = &record_arr[i];
-	fprintf(f_ptr, "%d,%d,%s,0x%" PRIxPTR ",%lf,%zu,%zu\n",
+	fprintf(f_ptr, "%d,%d,%s,%p" PRIxPTR ",%lf,%zu\n",
                 node_record->step,
                 node_record->node_n,
                 node_record->node_name,
                 node_record->tensor_addr,
                 node_record->node_compute_time_ns,
-                node_record->node_tensor_size_bytes,
-				node_record->node_input_size_bytes);
+                node_record->node_tensor_size_bytes);
   }
 
   fflush(f_ptr);
@@ -317,17 +316,6 @@ bool ggml_profile_node(struct ggml_tensor *t, bool ask,
 	  node_record.tensor_addr = (uintptr_t) ggml_profile_get_concrete_tensor_addr(t);
       node_record.node_compute_time_ns = node_compute_time_ns;
       node_record.node_tensor_size_bytes = ggml_nbytes_pad(t);
-      size_t node_input_size_bytes = 0;
-      for (int i = 0; i < GGML_MAX_SRC; i++) {
-        struct ggml_tensor *src = t->src[i];
-        if (src == NULL) {
-		  break;
-        }
-
-		node_input_size_bytes += ggml_nbytes_pad(src);
-      }
-	  node_record.node_input_size_bytes = node_input_size_bytes;
-
       ggml_profile_record_append(&node_record);
 	}
   }
