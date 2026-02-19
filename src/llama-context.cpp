@@ -1122,6 +1122,10 @@ int llama_context::decode(const llama_batch & batch_inp) {
 
     int64_t n_outputs_prev = 0;
 
+	static int step = 0;
+	ggml_profile_manager.step = step;
+	ggml_profile_manager.tmp_node_n = 0;
+
     do {
         const auto & ubatch = mctx->get_ubatch();
 
@@ -1182,10 +1186,6 @@ int llama_context::decode(const llama_batch & batch_inp) {
 
         // Dump compute graph
         {
-          static int step = 0;
-          ggml_profile_manager.step = step;
-          ggml_profile_manager.tmp_node_n = 0;
-
           GGML_PROFILE_MODE ggml_profile_mode =
               ggml_profile_manager.profile_mode;
           if (ggml_profile_mode & GGML_PROFILE_GRAPH) {
@@ -1193,7 +1193,7 @@ int llama_context::decode(const llama_batch & batch_inp) {
 			char path_template[256];
             strcpy(path_template, ggml_profile_manager.output_dir);
             strcat(path_template, "/step_%d_compute_graph.dot");
-            sprintf(output_path, path_template, step, (int) n_tokens_all);
+            sprintf(output_path, path_template, step);
 			ggml_graph_dump_dot(res->get_gf(), NULL, output_path);
           }
 
