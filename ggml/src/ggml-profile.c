@@ -217,7 +217,7 @@ void ggml_profile_record_write(void) {
   }
 
   // Write node_records in CSV format
-  fprintf(f_ptr, "step,node_n,node_name,tensor_addr,node_compute_time_ns,node_tensor_size_bytes,node_input_size_bytes\n");
+  fprintf(f_ptr, "step,node_n,node_name,tensor_addr,node_compute_time_ns,node_tensor_size_bytes\n");
   size_t record_size = ggml_profile_manager.record_size;
   ggml_profile_node_record_t* record_arr = ggml_profile_manager.record_arr;
   for (size_t i = 0; i < record_size; i++) {
