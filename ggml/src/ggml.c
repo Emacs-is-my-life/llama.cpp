@@ -7360,7 +7360,8 @@ void ggml_graph_dump_dot(const struct ggml_cgraph * gb, const struct ggml_cgraph
         }
 
         struct ggml_tensor *concrete_tensor = ggml_profile_get_concrete_tensor(node);
-		fprintf(fp, " | %p | %zu ]\n", (void*) concrete_tensor, ggml_nbytes_pad(concrete_tensor));
+        fprintf(fp, " addr=\"%p\";", (void *)concrete_tensor);
+		fprintf(fp, " size=\"%zu\"; ]\n", ggml_nbytes_pad(concrete_tensor));
     }
 
     for (int i = 0; i < gb->n_leafs; i++) {
@@ -7404,7 +7405,8 @@ void ggml_graph_dump_dot(const struct ggml_cgraph * gb, const struct ggml_cgraph
         }
         fprintf(fp, "\";");
 		struct ggml_tensor *concrete_tensor = ggml_profile_get_concrete_tensor(node);
-		fprintf(fp, " | %p | %zu ]\n", (void*) concrete_tensor, ggml_nbytes_pad(concrete_tensor));
+        fprintf(fp, " addr=\"%p\";", (void *)concrete_tensor);
+		fprintf(fp, " size=\"%zu\"; ]\n", ggml_nbytes_pad(concrete_tensor));		
     }
 
     for (int i = 0; i < gb->n_nodes; i++) {
